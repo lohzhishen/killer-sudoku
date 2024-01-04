@@ -1,0 +1,1 @@
+SUDOKU_SIZE=9
