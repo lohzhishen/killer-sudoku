@@ -1,4 +1,6 @@
-import cv
+from cv import scan
+from sudoku_solver import sudoku_solver
+from controller import implement_solution
 import matplotlib.pyplot as plt
 from numpy import asarray
 
@@ -28,7 +30,11 @@ def view_grid_centers(context):
 
 if __name__ == '__main__':
     context = {'title': 'Killer Sudoku Solver'}
-    cv.scan(context)
-    view_sum_roi(context, 2, 0)
-    plt.show()
+    scan(context)
+    # view_grid(context)
+    # plt.show()
+    print(context['board'])
+    # solution = sudoku_solver(context['board'])
+    # print(solution)
+    # implement_solution(context, solution)
     exit()

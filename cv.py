@@ -4,7 +4,9 @@ from time import sleep
 from functools import partial
 from numpy import linspace
 from PIL import Image
-
+from pytesseract import image_to_string
+from re import sub
+import matplotlib.pyplot as plt
 import sudoku
 
 
@@ -96,17 +98,17 @@ def calculate_box_centers(context: dict) -> list[list[list[int, int]]]:
 
 
 def detect_number(image: Image) -> int | None:
-    # user OCR to detect number
-    return NotImplemented
+    detected = image_to_string(image, config='--psm 10')
+    return sub("[^1-9]", "", detected)
 
 
 def get_digit_roi(context: dict, i: int, j: int) -> Image:
     anchor_x, anchor_y = context['top left']
     x, y = context['box centers'][i][j]
-    top = y - context['box height'] // 3 - anchor_y
-    bottom = y + context['box height'] // 3 - anchor_y
-    left = x - context['box width'] // 3 - anchor_x
-    right = x + context['box width'] // 3 - anchor_x
+    top = y - context['box height'] // 4 - anchor_y
+    bottom = y + context['box height'] // 4 - anchor_y
+    left = x - context['box width'] // 4 - anchor_x
+    right = x + context['box width'] // 4 - anchor_x
     return context['screen'].crop(box=(left, top, right, bottom))
 
 
@@ -118,6 +120,7 @@ def get_sum_roi(context: dict, i: int, j: int) -> Image:
     left = x - context['box width'] // 2 - anchor_x
     right = x - context['box width'] // 6 - anchor_x
     return context['screen'].crop(box=(left, top, right, bottom))
+
 
 def sudoku_image_to_array(context: dict) -> list[list[int]]:
     grid = [[0 for _ in range(sudoku.SUDOKU_SIZE)] for _ in range(sudoku.SUDOKU_SIZE)]
@@ -135,7 +138,8 @@ def scan(context: dict) -> None:
     
     # obtain coordinates for all the boxes within the sudoku game
     context['box centers'] = calculate_box_centers(context)
-    return 
+
     # obtain array representation of sudoku board
     context['board'] = sudoku_image_to_array(context)
+    
     
