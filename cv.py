@@ -63,7 +63,8 @@ def scan_sudoku_board(context: dict) -> Image:
 
     # region selected is too small
     while area < 200_000:
-        alert(text='Area selected is too small. Maximise the window and try again.', title=context['title'], button='OK')
+        alert(text='Area selected is too small. Maximise the window and try again.', 
+              title=context['title'], button='OK')
         screen = get_screenshot(context)
         area = context['width'] * context['height']
 
