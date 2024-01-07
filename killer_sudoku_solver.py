@@ -1,4 +1,4 @@
-from sudoku_solver import find_next_empty, sudoku_validate, iteration
+from sudoku_solver import sudoku_validate, iteration
 
 def killer_sudoku_solver(board: list[list[str]], group: list[list[int]], limit: dict[int: int], 
                   neighbors: dict[int: list[list[int, int]]]) -> list[list[list[str]]]:

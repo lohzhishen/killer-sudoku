@@ -6,7 +6,6 @@ from numpy import linspace
 from PIL import Image
 from pytesseract import image_to_string
 from re import sub
-import matplotlib.pyplot as plt
 import sudoku
 
 

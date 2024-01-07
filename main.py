@@ -31,8 +31,6 @@ def view_grid_centers(context):
 if __name__ == '__main__':
     context = {'title': 'Killer Sudoku Solver'}
     scan(context)
-    # view_grid(context)
-    # plt.show()
     print(context['board'])
     # solution = sudoku_solver(context['board'])
     # print(solution)
