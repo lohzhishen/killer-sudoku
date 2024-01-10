@@ -1,22 +1,34 @@
 import pygame
 
+pygame.init()
+
 IRON = (217, 219, 220) # background colour (selected)
 GREY = (135, 135, 135) # thin separator lines
 WHITE = (255, 255, 255) # background colour
 BLACK = (0, 0, 0) # separtor lines
 
-# NORMAL_TEXT = pygame.font.SysFont(None, 24) # display numbers in grid
-# SMALL_TEXT = pygame.font.SysFont(None, 11) # display sum of grids
+NORMAL_TEXT = pygame.font.SysFont(None, 92) # display numbers in grid
+SMALL_TEXT = pygame.font.SysFont(None, 11) # display sum of grids
 
-pygame.init()
 screen = pygame.display.set_mode((1280, 720)) # length x height, not resizable
 clock = pygame.time.Clock()
 running = True
 dt = 0
-context = {'selected': (-1, -1)}
+
+board = [["", "2", "", "", "3", "", "5", "6", ""],
+         ["9", "1", "5", "", "", "", "", "4", ""],
+         ["6", "", "", "5", "4", "", "1", "9", ""],
+         ["", "", "", "", "1", "", "", "7", ""],
+         ["", "", "9", "2", "6", "", "8", "5", ""],
+         ["", "7", "", "4", "", "", "", "", "6"],
+         ["", "9", "", "6", "", "", "7", "", ""],
+         ["", "", "4", "3", "", "", "2", "", ""],
+         ["", "", "", "", "9", "", "6", "", ""]]
+context = {'selected': (-1, -1), 'board': board}
 
 def draw_board(context, screen):
     selected = context['selected']
+    board = context['board']
 
     # fill the screen with a color to wipe away anything from last frame
     screen.fill('white')
@@ -35,6 +47,11 @@ def draw_board(context, screen):
                 pygame.draw.rect(screen, IRON, small_box)
             else:
                 pygame.draw.rect(screen, WHITE, small_box)
+            digit = board[r][c]
+            if digit != '':
+                digit = NORMAL_TEXT.render(digit, True, BLACK)
+                x, y = small_box[0], small_box[1]
+                screen.blit(digit, (x + 18, y + 6))
 
     # flip() the display to put your work on screen
     pygame.display.flip()
