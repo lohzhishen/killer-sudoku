@@ -8,7 +8,8 @@ WHITE = (255, 255, 255) # background colour
 BLACK = (0, 0, 0) # separtor lines
 
 NORMAL_TEXT = pygame.font.SysFont(None, 92) # display numbers in grid
-SMALL_TEXT = pygame.font.SysFont(None, 11) # display sum of grids
+TEXT = pygame.font.SysFont(None, 36)
+SMALL_TEXT = pygame.font.SysFont(None, 24) # display sum of grids
 
 screen = pygame.display.set_mode((1280, 720)) # length x height, not resizable
 clock = pygame.time.Clock()
@@ -52,12 +53,34 @@ def draw_board(context, screen):
                 digit = NORMAL_TEXT.render(digit, True, BLACK)
                 x, y = small_box[0], small_box[1]
                 screen.blit(digit, (x + 18, y + 6))
+    context['grid_locations'] = grid_locations
+
+    # draw the editor
+    pygame.draw.rect(screen, BLACK, (700, 50, 501, 181))
+    columns = ['Digit', 'Group sum', 'Border (Top)', 'Border (Bottom)', 'Border (Left)', "Border (Right)"]
+    label_boxes = [(701, 51 + 30 * i, 249, 29) for i in range(6)]
+    context_boxes = [(951, 51 + 30 * i, 249, 29) for i in range(6)]
+    for name, label_box, context_box in zip(columns, label_boxes, context_boxes):
+        c = box[0] - 701 // 25
+        pygame.draw.rect(screen, WHITE, label_box)
+        rect = pygame.draw.rect(screen, WHITE, context_box)
+        label = TEXT.render(name, True, BLACK)
+        x, y = label_box[0], label_box[1]
+        screen.blit(label, (x + 5, y + 3))
+        context[f'{name}_editor'] = rect
+    
+    # populate editor information
+    r, c = selected[0], selected[1]
+    if r != -1 and c != -1:
+        x, y = context_boxes[0]
+        screen.blit(TEXT.render(board[r][c], True, BLACK), (x + 5, y + 3))
 
     # flip() the display to put your work on screen
     pygame.display.flip()
-    return grid_locations
 
+active = False # text editor 
 while running:
+    r, c = context['selected']
     # poll for events
     # pygame.QUIT event means the user clicked X to close your window
     for event in pygame.event.get():
@@ -70,9 +93,20 @@ while running:
             for i, j, box in context['grid_locations']:
                 if box.collidepoint(pos):
                     context['selected'] = (i, j)
-
-    context['grid_locations'] = draw_board(context, screen)
-
+            
+            if context['Digit_editor'].collidepoint(pos):
+                context['Digit_editor_active'] = True
+            else:
+                context['Digit_editor_active'] = False
+        
+        elif context.get('Digit_editor_active', False) and event.type == pygame.KEYDOWN:
+            if r != -1 and c != -1:
+                if event.key == pygame.K_BACKSPACE:
+                    context['board'][r][c] = ''
+                elif event.unicode in [str(x) for x in range(1, 10)]:
+                    context['board'][r][c] = event.unicode
+            
+    draw_board(context, screen)
 
     # limits FPS to 60
     # dt is delta time in seconds since last frame, used for framerate-
