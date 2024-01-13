@@ -244,3 +244,34 @@ class DigitEditorRow(EditorRow):
             self.value = new_value
             self.board.update(self.row, i, j, new_value)
 
+
+class Button:
+    def __init__(self, 
+                 text: str = 'CONFIRM',
+                 text_color: tuple[int, int, int] = BLACK,
+                 background_color: tuple[int, int, int] = BLACK, 
+                 foreground_color: tuple[int, int, int] = GREY):
+        self.left = 850
+        self.top = 250
+
+        self.width = 200
+        self.height = 30
+
+        # rendering properties
+        self.text = TEXT.render(text, True, text_color)
+        width, height = self.text.get_size()
+        self.text_xshift = (self.width - width) // 2
+        self.text_yshift = (self.height - height) // 2
+        self.background_color = background_color
+        self.foreground_color = foreground_color
+        self.outline = pygame.Rect(self.left, self.top, self.width, self.height)
+        self.button = pygame.Rect(self.left + 1, self.top + 1 , self.width - 2, self.height - 2)
+
+    def draw(self, screen):
+        pygame.draw.rect(screen, self.background_color, self.outline)
+        pygame.draw.rect(screen, self.foreground_color, self.button)
+        screen.blit(self.text, (self.left + self.text_xshift, self.top + self.text_yshift))
+
+    def collide(self, pos):
+        return self.button.collidepoint(pos)
+    
