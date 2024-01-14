@@ -1,4 +1,5 @@
 import pygame
+import numpy as np
 
 # colors
 IRON = (217, 219, 220) # background colour (selected)
@@ -7,9 +8,10 @@ WHITE = (255, 255, 255) # background colour
 BLACK = (0, 0, 0) # separtor lines
 
 # fonts
-NORMAL_TEXT = pygame.font.SysFont(None, 92) # display numbers in grid
-SMALL_TEXT = pygame.font.SysFont(None, 24) # display sum of grids
-TEXT = pygame.font.SysFont(None, 36)
+FONT = None
+NORMAL_TEXT = pygame.font.SysFont(FONT, 92) # display numbers in grid
+SMALL_TEXT = pygame.font.SysFont(FONT, 24) # display sum of grids
+TEXT = pygame.font.SysFont(FONT, 36) # display text in editor
 
 class Board:
     def __init__(self, 
@@ -30,12 +32,13 @@ class Board:
 
         # record state of board
         self.data = [board, sums, top_border, bottom_border, left_border, right_border]
+        self.find_root()
 
         # rendering properties
         self.color = color
         self.rect = pygame.Rect(self.left, self.top, self.width, self.height)
         self.boxes = [[BigBox(self, i, j) for j in range(3)] for i in range(3)]
-        self.small_boxes = [[Box(self, i, j) for j in range(9)] for i in range(9)]
+        self.small_boxes = [[Box(self, i, j, self.sums_positions[i][j]) for j in range(9)] for i in range(9)]
 
     @property
     def position(self):
@@ -55,9 +58,7 @@ class Board:
                 self.small_boxes[i][j].draw(screen)
 
     def get(self, row: int, column: int):
-        # UPDATE TO RETURN ALL GRID INFO
-        return (self.data[0][row][column], 0, False, False, False, False)
-        return (board[row][colum] for board in self.data)
+        return [board[row][column] for board in self.data]
     
     def select(self, row: int, column: int):
         for i in range(9):
@@ -67,6 +68,27 @@ class Board:
     def update(self, i:int , j: int, k: int, new_value):
         self.data[i][j][k] = new_value
         self.small_boxes[j][k].update()
+
+    def find_root(self):
+        self.sums_positions = [[False for _ in range(9)] for _ in range(9)]
+        self.visited = [[False for _ in range(9)] for _ in range(9)]
+        for i in range(9):
+            for j in range(9):
+                if not self.visited[i][j]:
+                    self.sums_positions[i][j] = True
+                    self.explore(i, j)
+
+    def explore(self, i: int, j: int):
+        self.visited[i][j] = True
+        if i > 0 and not self.data[2][i][j] and not self.visited[i - 1][j]:
+            self.explore(i - 1, j)
+        if i < 8 and not self.data[3][i][j] and not self.visited[i + 1][j]:
+            self.explore(i + 1, j)
+        if j > 0 and not self.data[4][i][j] and not self.visited[i][j - 1]:
+            self.explore(i, j - 1)
+        if j < 8 and not self.data[5][i][j] and not self.visited[i][j + 1]:
+            self.explore(i, j + 1)
+
 
 class BigBox:
     def __init__(self, 
@@ -97,9 +119,11 @@ class BigBox:
 class Box:
     def __init__(self, 
                  board: Board, row: int, column: int,
+                 display_sum: bool,
                  default_color: tuple[int, int, int] = WHITE, 
                  highlighted_color: tuple[int, int, int] = IRON,
-                 text_color: tuple[int, int, int] = BLACK):
+                 text_color: tuple[int, int, int] = BLACK,
+                 border_color: tuple[int, int, int] = BLACK):
         # position within the board
         self.row = row
         self.column = column
@@ -116,27 +140,38 @@ class Box:
         self.top = game_top + 1 + (self.height + 1) * column
         
         # rendering properties
+        self.display_sum = display_sum
         self.text_color = text_color
         self.default_color = default_color
         self.highlighted_color = highlighted_color
+        self.border_color = border_color
         self.highlight = False
-        self.__value = board.get(self.row, self.column)
         self.rect = pygame.Rect(self.left, self.top, self.width, self.height)
+        self.update() 
 
     @property
     def value(self):
         return NORMAL_TEXT.render(self.__value[0], True, self.text_color)
+    
+    @property
+    def sum(self):
+        return SMALL_TEXT.render(str(self.__value[1]), True, self.text_color)
 
     def draw(self, screen):
         color = self.highlighted_color if self.highlight else self.default_color
         pygame.draw.rect(screen, color, self.rect)
         screen.blit(self.value, (self.left + 18, self.top + 6))
+        if self.display_sum:
+            screen.blit(self.sum, (self.left + 2, self.top + 2))
+        for border in self.border:
+            pygame.draw.line(screen, self.border_color, *border)
 
     def collide(self, pos):
         return self.rect.collidepoint(pos)
     
     def update(self):
         self.__value = self.board.get(self.row, self.column)
+        self.border = []
     
 
 class Editor:
