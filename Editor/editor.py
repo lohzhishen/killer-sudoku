@@ -107,11 +107,12 @@ while running:
         # allow user to edit editor
         elif event.type == pygame.KEYDOWN:
             for i, row in enumerate(editor.editor_rows):
-                if isinstance(row, DigitEditorRow):
+                if isinstance(row, DigitEditorRow) or isinstance(row, NumberEditorRow):
                     if event.key == pygame.K_BACKSPACE:
                         row.backspace()
                     else:
                         row.update(event.unicode)
+
                 
     # fill the screen with a color to wipe away anything from last frame
     screen.fill('white')

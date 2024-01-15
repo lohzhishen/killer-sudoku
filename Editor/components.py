@@ -38,7 +38,7 @@ class Board:
         self.color = color
         self.rect = pygame.Rect(self.left, self.top, self.width, self.height)
         self.boxes = [[BigBox(self, i, j) for j in range(3)] for i in range(3)]
-        self.small_boxes = [[Box(self, i, j, self.sums_positions[i][j]) for j in range(9)] for i in range(9)]
+        self.small_boxes = [[Box(self, i, j, True) for j in range(9)] for i in range(9)]
 
     @property
     def position(self):
@@ -172,7 +172,7 @@ class Box:
     def update(self):
         self.__value = self.board.get(self.row, self.column)
         self.border = []
-    
+
 
 class Editor:
     def __init__(self, board: Board):
@@ -191,7 +191,7 @@ class Editor:
         # rendering properties
         self.rect = pygame.Rect(self.left, self.top, self.width, self.height)
         self.rows = ['Digit', 'Group sum', 'Border (Top)', 'Border (Bottom)', 'Border (Left)', "Border (Right)"]
-        self.types = [DigitEditorRow, EditorRow, EditorRow, EditorRow, EditorRow, EditorRow]
+        self.types = [DigitEditorRow, NumberEditorRow, EditorRow, EditorRow, EditorRow, EditorRow]
         self.editor_rows = [c(self, board, i, label) for c, i, label in zip(self.types, range(len(self.rows)), self.rows)]
 
 
@@ -310,3 +310,21 @@ class Button:
     def collide(self, pos):
         return self.button.collidepoint(pos)
     
+class NumberEditorRow(EditorRow):
+    def backspace(self):
+        if self.active:
+            i, j = self.editor.selected
+            self.value = int(self.value_text) // 10
+            self.board.update(self.row, i, j, int(self.value_text))
+    
+    def update(self, new_value):
+        if self.active:
+            i, j = self.editor.selected
+            try:
+                new_value = int(new_value)
+                self.value = int(self.value_text) * 10 + new_value
+                if int(self.value_text) >= 100:
+                    self.value = int(self.value_text) % 100
+                self.board.update(self.row, i, j, int(self.value_text))
+            except ValueError:
+                pass
