@@ -9,7 +9,7 @@ BLACK = (0, 0, 0) # separtor lines
 
 # fonts
 FONT = None
-NORMAL_TEXT = pygame.font.SysFont(FONT, 92) # display numbers in grid
+NORMAL_TEXT = pygame.font.SysFont(FONT, 72) # display numbers in grid
 SMALL_TEXT = pygame.font.SysFont(FONT, 24) # display sum of grids
 TEXT = pygame.font.SysFont(FONT, 36) # display text in editor
 
@@ -57,7 +57,8 @@ class Board:
             for j in range(len(self.small_boxes[i])):
                 self.small_boxes[i][j].draw(screen)
 
-    def get(self, row: int, column: int):
+    def get(self, column: int, row: int):
+        print(row, column, [board[row][column] for board in self.data])
         return [board[row][column] for board in self.data]
     
     def select(self, row: int, column: int):
@@ -160,7 +161,7 @@ class Box:
     def draw(self, screen):
         color = self.highlighted_color if self.highlight else self.default_color
         pygame.draw.rect(screen, color, self.rect)
-        screen.blit(self.value, (self.left + 18, self.top + 6))
+        screen.blit(self.value, (self.left + 23, self.top + 13))
         if self.display_sum:
             screen.blit(self.sum, (self.left + 2, self.top + 2))
         for border in self.border:
@@ -172,6 +173,19 @@ class Box:
     def update(self):
         self.__value = self.board.get(self.row, self.column)
         self.border = []
+        if self.__value[2]:
+            Xs = np.linspace(self.left + 25, self.left + self.width - 10, 6)
+            self.border.extend([((Xs[2 * i], self.top + 5), (Xs[2 * i + 1], self.top + 5)) for i in range(3)])
+        if self.__value[3]:
+            Xs = np.linspace(self.left + 10, self.left + self.width - 10, 8)
+            self.border.extend([((Xs[2 * i], self.top + self.height - 5), (Xs[2 * i + 1], self.top + self.height - 5)) for i in range(4)])
+        if self.__value[4]:
+            Ys = np.linspace(self.top + 25, self.top + self.height - 10, 6)
+            self.border.extend([((self.left + 10, Ys[2 * i]), (self.left + 10, Ys[2 * i + 1])) for i in range(3)])
+        if self.__value[5]:
+            Ys = np.linspace(self.top + 10, self.top + self.height - 10, 8)
+            self.border.extend([((self.left + self.width - 10, Ys[2 * i]), (self.left + self.width - 10, Ys[2 * i + 1])) for i in range(4)])
+        
 
 
 class Editor:
