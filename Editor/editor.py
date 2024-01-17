@@ -79,7 +79,7 @@ while running:
             running = False
         
         # listener for mouse clicks
-        elif event.type == pygame.MOUSEBUTTONUP or event.type == pygame.MOUSEBUTTONDOWN:
+        elif event.type == pygame.MOUSEBUTTONUP:
             pos = pygame.mouse.get_pos()
             skip = False
             # allow user to select box
@@ -103,6 +103,7 @@ while running:
             if not skip:
                 if button.collide(pos):
                     running = False
+                    skip = True
 
         # allow user to edit editor
         elif event.type == pygame.KEYDOWN:

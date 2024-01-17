@@ -57,8 +57,7 @@ class Board:
             for j in range(len(self.small_boxes[i])):
                 self.small_boxes[i][j].draw(screen)
 
-    def get(self, column: int, row: int):
-        print(row, column, [board[row][column] for board in self.data])
+    def get(self, row: int, column: int):
         return [board[row][column] for board in self.data]
     
     def select(self, row: int, column: int):
@@ -205,7 +204,7 @@ class Editor:
         # rendering properties
         self.rect = pygame.Rect(self.left, self.top, self.width, self.height)
         self.rows = ['Digit', 'Group sum', 'Border (Top)', 'Border (Bottom)', 'Border (Left)', "Border (Right)"]
-        self.types = [DigitEditorRow, NumberEditorRow, EditorRow, EditorRow, EditorRow, EditorRow]
+        self.types = [DigitEditorRow, NumberEditorRow, BooleanEditorRow, BooleanEditorRow, BooleanEditorRow, BooleanEditorRow]
         self.editor_rows = [c(self, board, i, label) for c, i, label in zip(self.types, range(len(self.rows)), self.rows)]
 
 
@@ -222,9 +221,9 @@ class Editor:
         for row in self.editor_rows:
             row.draw(screen)
 
-    def choose(self, i):
+    def choose(self, i: int):
         for row in self.editor_rows:
-            row.active = i == row.row
+            row.set_active(i == row.row)
 
     def select(self, i, j):
         self.selected = (i, j)
@@ -263,6 +262,9 @@ class EditorRow:
         self.active = False
         self.board = board
         self.editor = editor
+
+    def set_active(self, value):
+        self.active = value
 
     def draw(self, screen):
         pygame.draw.rect(screen, self.background_color, self.label_rect)
@@ -326,14 +328,14 @@ class Button:
     
 class NumberEditorRow(EditorRow):
     def backspace(self):
-        if self.active:
-            i, j = self.editor.selected
+        i, j = self.editor.selected
+        if self.active and i != -1 and j != -1 :
             self.value = int(self.value_text) // 10
             self.board.update(self.row, i, j, int(self.value_text))
     
     def update(self, new_value):
-        if self.active:
-            i, j = self.editor.selected
+        i, j = self.editor.selected
+        if self.active and i != -1 and j != -1:
             try:
                 new_value = int(new_value)
                 self.value = int(self.value_text) * 10 + new_value
@@ -342,3 +344,14 @@ class NumberEditorRow(EditorRow):
                 self.board.update(self.row, i, j, int(self.value_text))
             except ValueError:
                 pass
+
+
+class BooleanEditorRow(EditorRow):
+    def set_active(self, value):
+        i, j = self.editor.selected
+        if value and i != -1 and j != -1:
+            value = True if self.value_text == 'False' else False
+            self.value = value
+            self.board.update(self.row, i, j, value)
+        
+        
