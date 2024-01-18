@@ -2,10 +2,6 @@ import pygame
 pygame.init()
 from components import *
 
-screen =  pygame.display.set_mode((1280, 720)) # length x height, not resizable
-clock = pygame.time.Clock()
-running = True
-dt = 0
 
 board = [["3", "", "", "9", "", "6", "1", "", "8"],
          ["", "", "", "", "5", "", "9", "4", "3"],
@@ -67,66 +63,106 @@ right_border = [[False, True, True, False, True, False, False, True, True],
                 [False, True, True, True, True, True, True, True, True],
                 [True, False, True, True, False, True, True, False, True]]
 
-game = Board(board, sums, top_border, bottom_border, left_border, right_border)
-editor = Editor(game)
-button = Button()
-
-while running:
-    
-    # poll for events
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
+class KillerSudokuEditor:
+    def __init__(self: 'KillerSudokuEditor', 
+                 board: list[list[str]], 
+                 sums: list[list[int]],
+                 top_border: list[list[bool]],
+                 bottom_border: list[list[bool]],
+                 left_border: list[list[bool]],
+                 right_border: list[list[bool]]
+                 ) -> None:
         
-        # listener for mouse clicks
-        elif event.type == pygame.MOUSEBUTTONUP:
-            pos = pygame.mouse.get_pos()
-            skip = False
-            # allow user to select box
-            for i, row in enumerate(game.small_boxes):
-                for j, box in enumerate(row):
-                    if box.collide(pos):
-                        game.select(i, j)
-                        editor.select(i, j)
-                        skip = True
-                        break
-            # allow user to select editor
-            if not skip:
-                for i, row in enumerate(editor.editor_rows):
-                    if row.collide(pos):
-                        editor.choose(i)
-                        skip = True
-                        break
+        # settings
+        self.screen_size = (1280, 720)
+
+        # state
+        self.screen =  pygame.display.set_mode(self.screen_size) # length x height, not resizable
+        self.game = Board(board, sums, top_border, bottom_border, left_border, right_border)
+        self.editor = Editor(self.game)
+        self.button = Button()
+        self.running = False
+
+    def draw(self: 'KillerSudokuEditor') -> None:
+        if self.running:
+            # wipe away anything from last frame
+            self.screen.fill('white')
+
+            # draw the new frame
+            self.game.draw(self.screen)
+            self.editor.draw(self.screen)
+            self.button.draw(self.screen)
+
+            # display on screen
+            pygame.display.flip()
+
+    def stop(self: 'KillerSudokuEditor') -> None:
+        self.running = False
+
+    def check_click_small_box(self: 'KillerSudokuEditor', pos: tuple[int, int]) -> bool:
+        if not self.running:
+            return False
+        for i, row in enumerate(self.game.small_boxes):
+            for j, box in enumerate(row):
+                if box.collide(pos):
+                    self.game.select(i, j)
+                    self.editor.select(i, j)
+                    return True
+        return False
+
+    def check_click_editor_row(self: 'KillerSudokuEditor', pos: tuple[int, int]) -> bool:
+        if not self.running:
+            return False
+        for i, row in enumerate(self.editor.editor_rows):
+            if row.collide(pos):
+                self.editor.choose(i)
+                return True
+        self.editor.choose(-1)
+        return False
+
+    def check_click_button(self: 'KillerSudokuEditor', pos: tuple[int, int]) -> bool:
+        if not self.running:
+            return False
+        elif self.button.collide(pos):
+            self.stop()
+            return True
+        return False
+    
+    def handle_key_press(self: 'KillerSudokuEditor', event: pygame.event.Event) -> None:
+        if not self.running:
+            return
+        for row in self.editor.editor_rows:
+            if isinstance(row, DigitEditorRow) or isinstance(row, NumberEditorRow):
+                if event.key == pygame.K_BACKSPACE:
+                    row.backspace()
                 else:
-                    editor.choose(-1)
-            # allow user to select confirm
-            if not skip:
-                if button.collide(pos):
-                    running = False
-                    skip = True
-
-        # allow user to edit editor
-        elif event.type == pygame.KEYDOWN:
-            for i, row in enumerate(editor.editor_rows):
-                if isinstance(row, DigitEditorRow) or isinstance(row, NumberEditorRow):
-                    if event.key == pygame.K_BACKSPACE:
-                        row.backspace()
-                    else:
-                        row.update(event.unicode)
-
+                    row.update(event.unicode)
+            
+    def start(self: 'KillerSudokuEditor') -> list:
+        self.running = True
+        while self.running:
+            
+            # poll for events
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    self.stop()
                 
-    # fill the screen with a color to wipe away anything from last frame
-    screen.fill('white')
+                # listener for mouse clicks
+                elif event.type == pygame.MOUSEBUTTONUP:
+                    pos = pygame.mouse.get_pos()
+                    if (self.check_click_small_box(pos) or 
+                        self.check_click_editor_row(pos) or 
+                        self.check_click_button(pos)):
+                        continue
 
-    # draw the new frame
-    game.draw(screen)
-    editor.draw(screen)
-    button.draw(screen)
+                # allow user to edit editor
+                elif event.type == pygame.KEYDOWN:
+                    self.handle_key_press(event)
+                    
+            self.draw()          
+        pygame.quit()
+        return self.game.data
 
-    # flip() the display to put your work on screen
-    pygame.display.flip()
-
-    # limits FPS to 60
-    dt = clock.tick(60) / 1000
-
-pygame.quit()
+if __name__ == '__main__':
+    editor = KillerSudokuEditor(board, sums, top_border, bottom_border, left_border, right_border)
+    editor.start()
