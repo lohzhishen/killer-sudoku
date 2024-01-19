@@ -1,5 +1,5 @@
 from pyautogui import click, write
-import sudoku
+import config
 
 
 def act(context: dict, i: int, j: int, digit: str) -> None:
@@ -10,8 +10,8 @@ def act(context: dict, i: int, j: int, digit: str) -> None:
 
 def implement_solution(context: dict, solution: list[list[str]]) -> None:
     """Takes control over the mouse and keyboard to enter the solution into the sudoku board."""
-    for i in range(sudoku.SUDOKU_SIZE):
-        for j in range(sudoku.SUDOKU_SIZE):
+    for i in range(config.SUDOKU_SIZE):
+        for j in range(config.SUDOKU_SIZE):
             digit = solution[i][j]
             act(context, i, j, digit)
     

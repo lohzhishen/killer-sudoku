@@ -6,7 +6,7 @@ from numpy import linspace
 from PIL import Image
 from pytesseract import image_to_string
 from re import sub
-import sudoku
+import config
 
 
 def on_click(context: dict, x: int, y: int, button: mouse.Button, pressed: bool) -> None | bool:
@@ -73,8 +73,8 @@ def scan_sudoku_board(context: dict) -> Image:
 
 def calculate_box_dimensions(context: dict) -> None:
     """Compute the width and height of a single box in the sudoku grid."""
-    context['box width'] = context['width'] // sudoku.SUDOKU_SIZE
-    context['box height'] = context['height'] // sudoku.SUDOKU_SIZE
+    context['box width'] = context['width'] // config.SUDOKU_SIZE
+    context['box height'] = context['height'] // config.SUDOKU_SIZE
 
 
 def calculate_box_centers(context: dict) -> list[list[list[int, int]]]:
@@ -92,9 +92,9 @@ def calculate_box_centers(context: dict) -> list[list[list[int, int]]]:
     bottom_ = bottom - context['box height'] // 2
 
     # create grid
-    Xs = linspace(left_, right_, sudoku.SUDOKU_SIZE, endpoint=True)
-    Ys = linspace(top_, bottom_, sudoku.SUDOKU_SIZE, endpoint=True)
-    return [[[Xs[i], Ys[j]] for i in range(sudoku.SUDOKU_SIZE)] for j in range(sudoku.SUDOKU_SIZE)]
+    Xs = linspace(left_, right_, config.SUDOKU_SIZE, endpoint=True)
+    Ys = linspace(top_, bottom_, config.SUDOKU_SIZE, endpoint=True)
+    return [[[Xs[i], Ys[j]] for i in range(config.SUDOKU_SIZE)] for j in range(config.SUDOKU_SIZE)]
 
 
 def detect_number(image: Image) -> int | None:
@@ -123,9 +123,9 @@ def get_sum_roi(context: dict, i: int, j: int) -> Image:
 
 
 def sudoku_image_to_array(context: dict) -> list[list[int]]:
-    grid = [[0 for _ in range(sudoku.SUDOKU_SIZE)] for _ in range(sudoku.SUDOKU_SIZE)]
-    for i in range(sudoku.SUDOKU_SIZE):
-        for j in range(sudoku.SUDOKU_SIZE):
+    grid = [[0 for _ in range(config.SUDOKU_SIZE)] for _ in range(config.SUDOKU_SIZE)]
+    for i in range(config.SUDOKU_SIZE):
+        for j in range(config.SUDOKU_SIZE):
             crop = get_digit_roi(context, i, j)
             grid[i][j] = detect_number(crop)
     return grid

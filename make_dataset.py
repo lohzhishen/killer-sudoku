@@ -3,7 +3,7 @@ from PIL import Image
 from numpy import pad
 from pathlib import Path
 from os import listdir
-import sudoku
+import config
 output = Path('Dataset', 'Raw')
 
 def get_box_roi(context: dict, i: int, j: int) -> Image:
@@ -27,11 +27,11 @@ def make_dataset():
     context['screen'] = scan_sudoku_board(context)
     context['box centers'] = calculate_box_centers(context)
     dataset_size = len(listdir(output))
-    for i in range(sudoku.SUDOKU_SIZE):
-        for j in range(sudoku.SUDOKU_SIZE):
+    for i in range(config.SUDOKU_SIZE):
+        for j in range(config.SUDOKU_SIZE):
             print(f'[INFO] Processing box ({i}, {j})')
             crop = get_box_roi(context, i, j)
-            crop.save(output / "{:>05}.png".format(dataset_size + i * sudoku.SUDOKU_SIZE + j))
+            crop.save(output / "{:>05}.png".format(dataset_size + i * config.SUDOKU_SIZE + j))
 
 
 if __name__ == "__main__":

@@ -13,6 +13,7 @@ board = [["3", "", "", "9", "", "6", "1", "", "8"],
          ["1", "", "2", "7", "", "4", "", "9", "5"],
          ["", "", "9", "", "", "5", "", "", "1"]]
 
+
 sums = [[9, 9, 5, 11, 11, 14, 14, 14, 17],
         [15, 9, 16, 13, 13, 21, 20, 17, 17],
         [15, 16, 16, 21, 21, 21, 20, 20, 17],
@@ -22,6 +23,7 @@ sums = [[9, 9, 5, 11, 11, 14, 14, 14, 17],
         [16, 13, 13, 3, 4, 26, 14, 18, 18],
         [16, 16, 13, 13, 4, 26, 14, 13, 18],
         [16, 16, 16, 13, 26, 26, 14, 13, 13]]
+
 
 top_border = [[True, True, True, True, True, True, True, True, True],
               [True, False, True, True, True, True, True, True, False],
@@ -33,6 +35,7 @@ top_border = [[True, True, True, True, True, True, True, True, True],
               [False, True, False, True, False, False, False, True, False],
               [False, True, True, False, True, False, False, False, True]]
 
+
 bottom_border = [[True, False, True, True, True, True, True, True, False],
                  [False, True, False, True, True, False, False, True, False],
                  [True, True, True, True, False, True, True, True, True],
@@ -42,6 +45,7 @@ bottom_border = [[True, False, True, True, True, True, True, True, False],
                  [False, True, False, True, False, False, False, True, False],
                  [False, True, True, False, True, False, False, False, True],
                  [True, True, True, True, True, True, True, True, True]]
+
 
 left_border = [[True, False, True, True, False, True, False, False, True],
                [True, True, True, True, False, True, True, True, False],
@@ -53,6 +57,7 @@ left_border = [[True, False, True, True, False, True, False, False, True],
                [True, False, True, True, True, True, True, True, True],
                [True, True, False, True, True, False, True, True, False]]
 
+
 right_border = [[False, True, True, False, True, False, False, True, True],
                 [True, True, True, False, True, True, True, False, True],
                 [True, False, True, False, False, True, False, True, True],
@@ -62,6 +67,7 @@ right_border = [[False, True, True, False, True, False, False, True, True],
                 [True, False, True, True, True, True, True, False, True],
                 [False, True, True, True, True, True, True, True, True],
                 [True, False, True, True, False, True, True, False, True]]
+
 
 class KillerSudokuEditor:
     def __init__(self: 'KillerSudokuEditor', 

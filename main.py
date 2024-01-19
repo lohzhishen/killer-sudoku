@@ -1,4 +1,4 @@
-from cv import scan
+import cv
 from sudoku_solver import sudoku_solver
 from controller import implement_solution
 import matplotlib.pyplot as plt
@@ -30,8 +30,8 @@ def view_grid_centers(context):
 
 if __name__ == '__main__':
     context = {'title': 'Killer Sudoku Solver'}
-    scan(context)
-    print(context['board'])
+    # cv.scan(context)
+    # print(context['board'])
     # solution = sudoku_solver(context['board'])
     # print(solution)
     # implement_solution(context, solution)
