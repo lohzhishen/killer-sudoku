@@ -14,14 +14,14 @@ SMALL_TEXT = pygame.font.SysFont(FONT, 24) # display sum of grids
 TEXT = pygame.font.SysFont(FONT, 36) # display text in editor
 
 class Board:
-    def __init__(self, 
+    def __init__(self: 'Board', 
                  board: list[list[str]] = None, 
                  sums: list[list[int]] = None, 
                  top_border: list[list[int]] = None,
                  bottom_border: list[list[int]] = None, 
                  left_border: list[list[int]] = None, 
                  right_border: list[list[int]] = None,
-                 color: tuple[int, int, int] = BLACK):
+                 color: tuple[int, int, int] = BLACK) -> 'Board':
         # record position to draw the board
         self.left = 30
         self.top = 30
@@ -40,15 +40,18 @@ class Board:
         self.boxes = [[BigBox(self, i, j) for j in range(3)] for i in range(3)]
         self.small_boxes = [[Box(self, i, j, True) for j in range(9)] for i in range(9)]
 
+
     @property
-    def position(self):
+    def position(self: 'Board') -> tuple[int, int]:
         return (self.left, self.top)
     
+
     @property
-    def size(self):
+    def size(self: 'Board') -> None:
         return (self.width, self.height)
     
-    def draw(self, screen):
+
+    def draw(self: 'Board', screen: pygame.Surface) -> None:
         pygame.draw.rect(screen, self.color, self.rect)
         for i in range(len(self.boxes)):
             for j in range(len(self.boxes[i])):
@@ -57,37 +60,20 @@ class Board:
             for j in range(len(self.small_boxes[i])):
                 self.small_boxes[i][j].draw(screen)
 
-    def get(self, row: int, column: int):
+
+    def get(self: 'Board', row: int, column: int) -> list[list[list]]:
         return [board[row][column] for board in self.data]
     
-    def select(self, row: int, column: int):
+
+    def select(self: 'Board', row: int, column: int) -> None:
         for i in range(9):
             for j in range(9):
                 self.small_boxes[i][j].highlight = i == row or j == column or (i // 3 == row // 3 and j // 3 == column // 3)
 
-    def update(self, i:int , j: int, k: int, new_value):
+
+    def update(self: 'Board', i:int , j: int, k: int, new_value) -> None:
         self.data[i][j][k] = new_value
         self.small_boxes[j][k].update()
-
-    def find_root(self):
-        self.sums_positions = [[False for _ in range(9)] for _ in range(9)]
-        self.visited = [[False for _ in range(9)] for _ in range(9)]
-        for i in range(9):
-            for j in range(9):
-                if not self.visited[i][j]:
-                    self.sums_positions[i][j] = True
-                    self.explore(i, j)
-
-    def explore(self, i: int, j: int):
-        self.visited[i][j] = True
-        if i > 0 and not self.data[2][i][j] and not self.visited[i - 1][j]:
-            self.explore(i - 1, j)
-        if i < 8 and not self.data[3][i][j] and not self.visited[i + 1][j]:
-            self.explore(i + 1, j)
-        if j > 0 and not self.data[4][i][j] and not self.visited[i][j - 1]:
-            self.explore(i, j - 1)
-        if j < 8 and not self.data[5][i][j] and not self.visited[i][j + 1]:
-            self.explore(i, j + 1)
 
 
 class BigBox:
