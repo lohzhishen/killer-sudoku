@@ -123,8 +123,17 @@ def validate_region(
     neighbor = neighbors[group]
 
     # validate the group sum
-    total = sum([int(board[x][y]) for x, y in neighbor if board[x][y] != ''])
-    return total <= limit
+    total = 0
+    empty = False
+    for x, y in neighbor:
+        if board[x][y] != '':
+            total += int(board[x][y])
+        else:
+            empty = True
+    if empty:
+        return total < limit
+    else:
+        return total == limit
 
             
 def group(
@@ -159,7 +168,7 @@ def group(
         A dictionary linking each group number to the positions of all members in the group.
     If the return value is None, the configuration of the board is not valid.
     """
-    if not validate_boarders(top_border, bottom_border, left_border, right_border):
+    if not validate_borders(top_border, bottom_border, left_border, right_border):
         # problem detected with the borders
         return None
     
@@ -215,7 +224,7 @@ def group(
     return groups, limits, neighbors
 
 
-def validate_boarders(
+def validate_borders(
         top_border: list[list[bool]], 
         bottom_border: list[list[bool]], 
         left_border: list[list[bool]], 
@@ -252,8 +261,10 @@ def validate_boarders(
                 (j == SUDOKU_SIZE - 1 and not right_border[i][j]) or 
                 # for every cell with a border above, the cell above must have a border below
                 (0 < i < SUDOKU_SIZE and top_border[i][j] and not bottom_border[i - 1][j]) or
+                (0 <= i < SUDOKU_SIZE - 1 and bottom_border[i][j] and not top_border[i + 1][j]) or
                 # for every cell with a border on the right, the cell to the right must have a border on the left 
-                (0 <= j < SUDOKU_SIZE - 1 and right_border[i][j] and not left_border[i][j + 1])
+                (0 <= j < SUDOKU_SIZE - 1 and right_border[i][j] and not left_border[i][j + 1]) or
+                (0 < j < SUDOKU_SIZE and left_border[i][j] and not right_border[i][j - 1])
                 ):
                 return False
     return True
@@ -280,11 +291,16 @@ def validate_groups(
     validity: bool
         Indicates whether each member of a group has the same sum limit.
     """
+    seen = []
     # iterate over all the groups
-    for group_number, total in limits:
+    for group_number, total in limits.items():
         # check if each member within the group has the same sum limit
         for x, y in neighbors[group_number]:
-            if sums[x][y] != total:
+            seen.append((x, y))
+            if 0 > x or x >= SUDOKU_SIZE or 0 > y or y >= SUDOKU_SIZE or sums[x][y] != total:
                 return False
-    return True
+    # check if every box is in a group
+    # and check if groups are disjoint
+    return len(seen) == SUDOKU_SIZE ** 2 and len(seen) == len(set(seen))
+    
 
