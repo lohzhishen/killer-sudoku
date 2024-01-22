@@ -1,4 +1,4 @@
-from cv import scan_sudoku_board, calculate_box_centers
+from Interaction.cv import scan_sudoku_board, calculate_box_centers
 from PIL import Image
 from numpy import pad
 from pathlib import Path

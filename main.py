@@ -1,6 +1,6 @@
-import cv
-from sudoku_solver import sudoku_solver
-from controller import implement_solution
+import Interaction.cv as cv
+from Solver.sudoku_solver import sudoku_solver
+from Interaction.controller import implement_solution
 import matplotlib.pyplot as plt
 from numpy import asarray
 
