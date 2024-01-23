@@ -32,7 +32,6 @@ class Board:
 
         # record state of board
         self.data = [board, sums, top_border, bottom_border, left_border, right_border]
-        self.find_root()
 
         # rendering properties
         self.color = color
@@ -158,18 +157,25 @@ class Box:
     def update(self):
         self.__value = self.board.get(self.row, self.column)
         self.border = []
+        self.display_sum = self.__value[1] != 0
         if self.__value[2]:
-            Xs = np.linspace(self.left + 25, self.left + self.width - 10, 6)
-            self.border.extend([((Xs[2 * i], self.top + 5), (Xs[2 * i + 1], self.top + 5)) for i in range(3)])
+            if not self.display_sum:
+                Xs = np.linspace(self.left + 10, self.left + self.width - 10, 8)
+            else:
+                Xs = np.linspace(self.left + 25, self.left + self.width - 10, 6)
+            self.border.extend([((Xs[2 * i], self.top + 5), (Xs[2 * i + 1], self.top + 5)) for i in range(len(Xs) // 2)])
         if self.__value[3]:
             Xs = np.linspace(self.left + 10, self.left + self.width - 10, 8)
-            self.border.extend([((Xs[2 * i], self.top + self.height - 5), (Xs[2 * i + 1], self.top + self.height - 5)) for i in range(4)])
+            self.border.extend([((Xs[2 * i], self.top + self.height - 5), (Xs[2 * i + 1], self.top + self.height - 5)) for i in range(len(Xs) // 2)])
         if self.__value[4]:
-            Ys = np.linspace(self.top + 25, self.top + self.height - 10, 6)
-            self.border.extend([((self.left + 10, Ys[2 * i]), (self.left + 10, Ys[2 * i + 1])) for i in range(3)])
+            if not self.display_sum:
+                Ys = np.linspace(self.top + 10, self.top + self.height - 10, 8)
+            else:
+                Ys = np.linspace(self.top + 20, self.top + self.height - 10, 6)
+            self.border.extend([((self.left + 10, Ys[2 * i]), (self.left + 10, Ys[2 * i + 1])) for i in range(len(Ys) // 2)])
         if self.__value[5]:
             Ys = np.linspace(self.top + 10, self.top + self.height - 10, 8)
-            self.border.extend([((self.left + self.width - 10, Ys[2 * i]), (self.left + self.width - 10, Ys[2 * i + 1])) for i in range(4)])
+            self.border.extend([((self.left + self.width - 10, Ys[2 * i]), (self.left + self.width - 10, Ys[2 * i + 1])) for i in range(len(Ys) // 2)])
         
 
 

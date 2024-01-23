@@ -194,6 +194,7 @@ def group(
         -------
         This algorithm assumes that the borders are valid.
         """
+        sums[i][j] = limits[group_number]
         groups[i][j] = group_number
         visited[i][j] = True
         neighbors[group_number].append([i, j])
@@ -211,7 +212,7 @@ def group(
     # explore the board
     for i in range(SUDOKU_SIZE):
         for j in range(SUDOKU_SIZE):
-            if not visited[i][j]:
+            if not visited[i][j] and sums[i][j] != 0:
                 group_number += 1
                 limits[group_number] = sums[i][j]
                 neighbors[group_number] = []

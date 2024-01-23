@@ -245,6 +245,18 @@ def test_group_1():
     assert limits == limits_
     assert neighbors == neighbors_
 
+def test_group_2():
+    """Test description: valid set up"""
+    temp = sums[0][1]
+    sums[0][1] = 0
+    result = group(sums, top_border, bottom_border, left_border, right_border)
+    assert len(result) == 3
+    groups_, limits_, neighbors_ = result
+    assert groups == groups_
+    assert limits == limits_
+    assert neighbors == neighbors_
+    sums[0][1] = temp
+
 # ========== validate_region ==========
 def test_validate_region_1():
     """Test description: Region has empty space and is below total value"""
