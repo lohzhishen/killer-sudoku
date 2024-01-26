@@ -1,6 +1,7 @@
 import Interaction.cv as cv
 from Solver.sudoku_solver import sudoku_solver
 from Interaction.controller import implement_solution
+from Editor import editor
 import matplotlib.pyplot as plt
 from numpy import asarray
 
@@ -30,8 +31,9 @@ def view_grid_centers(context):
 
 if __name__ == '__main__':
     context = {'title': 'Killer Sudoku Solver'}
-    # cv.scan(context)
-    # print(context['board'])
+    cv.scan(context)
+    app = editor.KillerSudokuEditor(*context['data'])
+    app.start()
     # solution = sudoku_solver(context['board'])
     # print(solution)
     # implement_solution(context, solution)
