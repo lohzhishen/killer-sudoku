@@ -1,38 +1,81 @@
-from Interaction.cv import scan_sudoku_board, calculate_box_centers
-from PIL import Image
-from numpy import pad
-from pathlib import Path
-from os import listdir
+import matplotlib.pyplot as plt
+from Interaction import cv
+import numpy as np
+import pathlib
+import skimage
 import config
-output = Path('Dataset', 'Raw')
-
-def get_box_roi(context: dict, i: int, j: int) -> Image:
-    if 'padded_screen' not in context:
-        image = context['screen']
-        padding = ((context['box height'] // 2, context['box height'] // 2), (context['box width'] // 2, context['box width'] // 2), (0, 0))
-        image = pad(image, padding, constant_values=255)
-        context['padded_screen'] = Image.fromarray(image, 'RGB')
-    image = context['padded_screen']
-    anchor_x, anchor_y = context['top left']
-    x, y = context['box centers'][i][j]
-    top = y - context['box height'] // 1.5 - anchor_y + context['box height'] // 2
-    bottom = y + context['box height'] // 1.5 - anchor_y + context['box height'] // 2
-    left = x - context['box width'] // 1.5 - anchor_x + context['box width'] // 2
-    right = x + context['box width'] // 1.5 - anchor_x + context['box width'] // 2
-    return context['padded_screen'].crop(box=(left, top, right, bottom))
+import PIL
+import os
 
 
-def make_dataset():
+# output directories 
+BOX_OUTPUT = pathlib.Path('Models', 'Dataset', 'Wall Recognizer', 'Raw')
+DIGIT_OUTPUT = pathlib.Path('Models', 'Dataset', 'Digit Recognizer', 'Raw')
+
+
+# ========== processing functions ============
+def process_board(screen: np.ndarray) -> list[list[int]]:
+    regions = cv.preprocess_board(screen)
+    height, width = regions.shape
+
+    Xs = np.linspace(0, width, config.SUDOKU_SIZE + 1, dtype=int)
+    Ys = np.linspace(0, height, config.SUDOKU_SIZE + 1, dtype=int)
+    offset = 5
+    for j in range(config.SUDOKU_SIZE):
+        for i in range(config.SUDOKU_SIZE):
+            xmin, ymin, xmax, ymax = max(0, Xs[i] - offset), max(0, Ys[j] - offset), min(width, Xs[i + 1] + offset), min(height, Ys[j + 1] + offset)
+            crop = regions[ymin:ymax, xmin:xmax]
+            process_box(crop)
+
+
+def process_box(image: np.ndarray) -> None:
+    # save the image
+    save_box_image(cv.preprocess_box_region(image))
+
+    # extract out digits
+    image_height, image_width = image.shape
+    zones = skimage.measure.label(image, connectivity=2)
+    regions = skimage.measure.regionprops(zones)
+    regions.sort(key=lambda x: -x.area)
+    for region in regions:
+        #plt.imshow(image[region.slice])
+        #plt.colorbar()
+        #plt.show()
+        ymin, xmin, ymax, xmax = region.bbox
+        width, height = xmax - xmin, ymax - ymin
+        area = region.area
+        num_pixels = region.num_pixels
+        if width > 0.9 * image_width or height > 0.9 * image_height:
+            continue
+        elif xmax >= image_width / 2 and xmin <= image_width / 2 and ymax >= image_height // 2 and ymin <= image_height // 2 and area >= 13 and height / width >= 1:
+            # center digits
+            save_digit_image(cv.preprocess_digit_region(zones, region))
+        elif xmin < image_width / 2 and ymax < image_height / 2 and area >= 10 and 3 >= height / width >= 1 and num_pixels != width * height:
+            # sum digits
+            save_digit_image(cv.preprocess_digit_region(zones, region))
+
+
+# ========== saving images ==========
+def save_digit_image(image: np.ndarray) -> None:
+    # save the image
+    image = PIL.Image.fromarray(image.astype(np.uint8))
+    file_name = f"{len(os.listdir(DIGIT_OUTPUT)):>05}.png"
+    image.save(DIGIT_OUTPUT / file_name)
+
+
+def save_box_image(image: np.ndarray) -> None:
+    # save the image
+    image = PIL.Image.fromarray(image.astype(np.uint8))
+    file_name = f"{len(os.listdir(BOX_OUTPUT)):>05}.png"
+    #image.save(BOX_OUTPUT / file_name)
+
+
+# ========== main ==========
+def main():
     context = {"title": 'Dataset Maker'}
-    context['screen'] = scan_sudoku_board(context)
-    context['box centers'] = calculate_box_centers(context)
-    dataset_size = len(listdir(output))
-    for i in range(config.SUDOKU_SIZE):
-        for j in range(config.SUDOKU_SIZE):
-            print(f'[INFO] Processing box ({i}, {j})')
-            crop = get_box_roi(context, i, j)
-            crop.save(output / "{:>05}.png".format(dataset_size + i * config.SUDOKU_SIZE + j))
+    context['screen'] = cv.scan_sudoku_board(context)
+    process_board(context['screen'])
 
 
 if __name__ == "__main__":
-    make_dataset()
+    main()
