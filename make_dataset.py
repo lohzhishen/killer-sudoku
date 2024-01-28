@@ -1,4 +1,3 @@
-import matplotlib.pyplot as plt
 from Interaction import cv
 import numpy as np
 import pathlib
@@ -50,7 +49,7 @@ def process_box(image: np.ndarray) -> None:
         elif xmax >= image_width / 2 and xmin <= image_width / 2 and ymax >= image_height // 2 and ymin <= image_height // 2 and area >= 13 and height / width >= 1:
             # center digits
             save_digit_image(cv.preprocess_digit_region(zones, region))
-        elif xmin < image_width / 2 and ymax < image_height / 2 and area >= 10 and 3 >= height / width >= 1 and num_pixels != width * height:
+        elif xmin < image_width / 2 and ymax < image_height / 2 and height > 2 and area >= 10 and 3 >= height / width >= 1 and num_pixels != width * height:
             # sum digits
             save_digit_image(cv.preprocess_digit_region(zones, region))
 
@@ -67,7 +66,7 @@ def save_box_image(image: np.ndarray) -> None:
     # save the image
     image = PIL.Image.fromarray(image.astype(np.uint8))
     file_name = f"{len(os.listdir(BOX_OUTPUT)):>05}.png"
-    #image.save(BOX_OUTPUT / file_name)
+    image.save(BOX_OUTPUT / file_name)
 
 
 # ========== main ==========
