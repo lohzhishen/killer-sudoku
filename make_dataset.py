@@ -10,7 +10,7 @@ import os
 # output directories 
 BOX_OUTPUT = pathlib.Path('Models', 'Dataset', 'Wall Recognizer', 'Raw')
 DIGIT_OUTPUT = pathlib.Path('Models', 'Dataset', 'Digit Recognizer', 'Raw')
-
+LABELLED_BOX_OUTPUT = pathlib.Path('Models', 'Dataset', 'Wall Recognizer', 'Labelled')
 
 # ========== processing functions ============
 def process_board(screen: np.ndarray) -> list[list[int]]:
@@ -59,13 +59,14 @@ def save_digit_image(image: np.ndarray) -> None:
     # save the image
     image = PIL.Image.fromarray(image.astype(np.uint8))
     file_name = f"{len(os.listdir(DIGIT_OUTPUT)):>05}.png"
-    image.save(DIGIT_OUTPUT / file_name)
+    # image.save(DIGIT_OUTPUT / file_name)
 
 
 def save_box_image(image: np.ndarray) -> None:
     # save the image
     image = PIL.Image.fromarray(image.astype(np.uint8))
-    file_name = f"{len(os.listdir(BOX_OUTPUT)):>05}.png"
+    no = len(os.listdir(BOX_OUTPUT)) + len(os.listdir(LABELLED_BOX_OUTPUT))
+    file_name = f"{no:>05}.png"
     image.save(BOX_OUTPUT / file_name)
 
 
