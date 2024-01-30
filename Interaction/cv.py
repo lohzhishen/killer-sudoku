@@ -1,8 +1,11 @@
 import matplotlib.pyplot as plt
+from tensorflow import keras
+import tensorflow as tf
 import numpy as np
 import functools
 import pyautogui
 import skimage
+import pathlib
 import config
 import pynput
 import time
@@ -101,8 +104,15 @@ def calculate_box_centers(context: dict) -> list[list[list[int, int]]]:
 
 # ========== Converting image to arrays ==========
 def detect_digit(image: np.ndarray) -> int:
-    """TODO: Implement the digit recognizer model"""
-    return 1
+    model = keras.models.load_model(pathlib.Path('Models', 'digit_recognizer.keras'))
+    image = tf.data.Dataset.from_tensor_slices([image])
+    def transform(x):
+        x = tf.reshape(x, [1, 28, 28, 1])
+        x = tf.cast(x, tf.float32) / 255
+        x = tf.image.resize(x, [28,28])
+        return x
+    image = image.map(transform)
+    return model.predict(image).argmax(axis=1)
 
 
 def detect_borders(image: np.ndarray) -> tuple[bool, bool, bool, bool]:
