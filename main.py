@@ -1,37 +1,25 @@
-import Interaction.cv as cv
+from interaction import Controller, Screenshot
+from detection import Detection
+
 from Solver.sudoku_solver import sudoku_solver
-from Interaction.controller import implement_solution
 from Editor import editor
 import matplotlib.pyplot as plt
 from numpy import asarray
 
-def view_digit_roi(context, i=1, j=0):
-    plt.imshow(cv.get_digit_roi(context, i, j))
-    plt.xticks([])
-    plt.yticks([])
 
-def view_sum_roi(context, i=1, j=0):
-    plt.imshow(cv.get_sum_roi(context, i, j))
-    plt.xticks([])
-    plt.yticks([])
+def scan(context: dict) -> None:
+    # obtain screenshot of sudoku board
+    context['screen'] = Screenshot.scan_sudoku_board(context)
+    
+    # obtain coordinates for all the boxes within the sudoku game
+    context['box centers'] = Controller.calculate_box_centers(context)
 
-def view_grid(context):
-    plt.imshow(context['screen'])
-
-def view_grid_centers(context):
-    grid_centers = context['box centers']
-    centers = []
-    for row in grid_centers:
-        centers.extend(row)
-    centers = asarray(centers)
-    centers[:, 0] -= context['top left'][0]
-    centers[:, 1] -= context['top left'][1]
-    plt.scatter(centers[:, 0], centers[:, 1], c='red', marker='o')
-
+    # obtain array representation of sudoku board
+    context['data'] = Detection.process_board(context['screen'])
 
 if __name__ == '__main__':
     context = {'title': 'Killer Sudoku Solver'}
-    cv.scan(context)
+    scan(context)
     app = editor.KillerSudokuEditor(*context['data'])
     app.start()
     # solution = sudoku_solver(context['board'])
