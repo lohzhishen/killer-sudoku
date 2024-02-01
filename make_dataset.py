@@ -1,4 +1,5 @@
-from Interaction import cv
+from detection import Detection
+from interaction import Screenshot
 import numpy as np
 import pathlib
 import skimage
@@ -14,7 +15,7 @@ LABELLED_BOX_OUTPUT = pathlib.Path('Models', 'Dataset', 'Wall Recognizer', 'Labe
 
 # ========== processing functions ============
 def process_board(screen: np.ndarray) -> list[list[int]]:
-    regions = cv.preprocess_board(screen)
+    regions = Detection.preprocess_board(screen)
     height, width = regions.shape
 
     Xs = np.linspace(0, width, config.SUDOKU_SIZE + 1, dtype=int)
@@ -29,7 +30,7 @@ def process_board(screen: np.ndarray) -> list[list[int]]:
 
 def process_box(image: np.ndarray) -> None:
     # save the image
-    save_box_image(cv.preprocess_box_region(image))
+    save_box_image(Detection.preprocess_box_region(image))
 
     # extract out digits
     image_height, image_width = image.shape
@@ -37,21 +38,19 @@ def process_box(image: np.ndarray) -> None:
     regions = skimage.measure.regionprops(zones)
     regions.sort(key=lambda x: -x.area)
     for region in regions:
-        #plt.imshow(image[region.slice])
-        #plt.colorbar()
-        #plt.show()
         ymin, xmin, ymax, xmax = region.bbox
         width, height = xmax - xmin, ymax - ymin
         area = region.area
         num_pixels = region.num_pixels
+
         if width > 0.9 * image_width or height > 0.9 * image_height:
             continue
         elif xmax >= image_width / 2 and xmin <= image_width / 2 and ymax >= image_height // 2 and ymin <= image_height // 2 and area >= 13 and height / width >= 1:
             # center digits
-            save_digit_image(cv.preprocess_digit_region(zones, region))
+            save_digit_image(Detection.preprocess_digit_region(zones, region))
         elif xmin < image_width / 2 and ymax < image_height / 2 and height > 2 and area >= 10 and 3 >= height / width >= 1 and num_pixels != width * height:
             # sum digits
-            save_digit_image(cv.preprocess_digit_region(zones, region))
+            save_digit_image(Detection.preprocess_digit_region(zones, region))
 
 
 # ========== saving images ==========
@@ -67,13 +66,13 @@ def save_box_image(image: np.ndarray) -> None:
     image = PIL.Image.fromarray(image.astype(np.uint8))
     no = len(os.listdir(BOX_OUTPUT)) + len(os.listdir(LABELLED_BOX_OUTPUT))
     file_name = f"{no:>05}.png"
-    image.save(BOX_OUTPUT / file_name)
+    # image.save(BOX_OUTPUT / file_name)
 
 
 # ========== main ==========
 def main():
     context = {"title": 'Dataset Maker'}
-    context['screen'] = cv.scan_sudoku_board(context)
+    context['screen'] = Screenshot.scan_sudoku_board(context)
     process_board(context['screen'])
 
 
