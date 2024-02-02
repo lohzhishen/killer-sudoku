@@ -1,7 +1,8 @@
 """Usage: python -m pytest"""
 
 import pytest
-from .killer_sudoku_solver import *
+from solver import SudokuSolver, KillerSudokuSolver
+
 
 board = [['','','','8','','','','',''],
          ['2','','','','','','','',''],
@@ -130,115 +131,115 @@ solution = [['4', '6', '9', '8', '3', '2', '5', '7', '1'],
 # ========== validate_borders ==========
 def test_validate_borders_1():
     """Test description: valid borders"""
-    assert validate_borders(top_border, bottom_border, left_border, right_border) == True
+    assert KillerSudokuSolver.validate_borders(top_border, bottom_border, left_border, right_border) == True
 
 def test_validate_borders_2():
     """Test descripton: open top border"""
     top_border[0][0] = False
-    assert validate_borders(top_border, bottom_border, left_border, right_border) == False
+    assert KillerSudokuSolver.validate_borders(top_border, bottom_border, left_border, right_border) == False
     top_border[0][0] = True
 
 def test_validate_borders_3():
     """Test description: open bottom border"""
     bottom_border[8][8] = False
-    assert validate_borders(top_border, bottom_border, left_border, right_border) == False
+    assert KillerSudokuSolver.validate_borders(top_border, bottom_border, left_border, right_border) == False
     bottom_border[8][8] = True
 
 def test_validate_borders_4():
     """Test description: open left border"""
     left_border[0][0] = False
-    assert validate_borders(top_border, bottom_border, left_border, right_border) == False
+    assert KillerSudokuSolver.validate_borders(top_border, bottom_border, left_border, right_border) == False
     left_border[0][0] = True
 
 def test_validate_borders_5():
     """Test description: open right border"""
     right_border[0][8] = False
-    assert validate_borders(top_border, bottom_border, left_border, right_border) == False
+    assert KillerSudokuSolver.validate_borders(top_border, bottom_border, left_border, right_border) == False
     right_border[0][8] = True
 
 def test_validate_borders_6():
     """Test description: missing vertically adjacent borders"""
     top_border[1][0] = False
-    assert validate_borders(top_border, bottom_border, left_border, right_border) == False
+    assert KillerSudokuSolver.validate_borders(top_border, bottom_border, left_border, right_border) == False
     top_border[1][0] = True
 
 def test_validate_borders_7():
     """Test description: missing vertically adjacent borders"""
     bottom_border[0][0] = False
-    assert validate_borders(top_border, bottom_border, left_border, right_border) == False
+    assert KillerSudokuSolver.validate_borders(top_border, bottom_border, left_border, right_border) == False
     bottom_border[0][0] = True
 
 def test_validate_borders_8():
     """Test description: missing vertically adjacent borders"""
     right_border[0][1] = False
-    assert validate_borders(top_border, bottom_border, left_border, right_border) == False
+    assert KillerSudokuSolver.validate_borders(top_border, bottom_border, left_border, right_border) == False
     right_border[0][1] = True
 
 def test_validate_borders_9():
     """Test description: missing horizontally adjacent borders"""
     left_border[0][2] = False
-    assert validate_borders(top_border, bottom_border, left_border, right_border) == False
+    assert KillerSudokuSolver.validate_borders(top_border, bottom_border, left_border, right_border) == False
     left_border[0][2] = True
 
 
 # ========== validate_groups ==========
 def test_validate_groups_1():
     """Test description: valid groups"""
-    assert validate_groups(sums, limits, neighbors) == True
+    assert KillerSudokuSolver.validate_groups(sums, limits, neighbors) == True
 
 def test_validate_groups_2():
     """Test description: inconsistent groups"""
     temp = limits[1]
     limits[1] = 0
-    assert validate_groups(sums, limits, neighbors) == False
+    assert KillerSudokuSolver.validate_groups(sums, limits, neighbors) == False
     limits[1] = temp
 
 def test_validate_groups_3():
     """Test description: not disjoint groups"""
     neighbors[1].append([8,8])
-    assert validate_groups(sums, limits, neighbors) == False
+    assert KillerSudokuSolver.validate_groups(sums, limits, neighbors) == False
     neighbors[1].pop()
 
 def test_validate_groups_4():
     """Test description: box without group"""
     x = neighbors[1].pop()
-    assert validate_groups(sums, limits, neighbors) == False
+    assert KillerSudokuSolver.validate_groups(sums, limits, neighbors) == False
     neighbors[1].append(x)
 
 def test_validate_groups_5():
     """Test description: group has box which is out of range"""
     neighbors[1].append([9,8])
-    assert validate_groups(sums, limits, neighbors) == False
+    assert KillerSudokuSolver.validate_groups(sums, limits, neighbors) == False
     neighbors[1].pop()
 
 def test_validate_groups_6():
     """Test description: group has box which is out of range"""
     neighbors[1].append([8,9])
-    assert validate_groups(sums, limits, neighbors) == False
+    assert KillerSudokuSolver.validate_groups(sums, limits, neighbors) == False
     neighbors[1].pop()
 
 def test_validate_groups_7():
     """Test description: group has box which is out of range"""
     neighbors[1].append([0,-1])
-    assert validate_groups(sums, limits, neighbors) == False
+    assert KillerSudokuSolver.validate_groups(sums, limits, neighbors) == False
     neighbors[1].pop()
 
 def test_validate_groups_8():
     """Test description: group has box which is out of range"""
     neighbors[1].append([-1,0])
-    assert validate_groups(sums, limits, neighbors) == False
+    assert KillerSudokuSolver.validate_groups(sums, limits, neighbors) == False
     neighbors[1].pop()
 
 def test_validate_groups_9():
     """Test description: groups members are not unique"""
     neighbors[1].append([0,0])
-    assert validate_groups(sums, limits, neighbors) == False
+    assert KillerSudokuSolver.validate_groups(sums, limits, neighbors) == False
     neighbors[1].pop()
 
 # ========== group ==========
 def test_group_1():
     """Test description: valid set up"""
-    result = group(sums, top_border, bottom_border, left_border, right_border)
+    result = KillerSudokuSolver.group(sums, top_border, bottom_border, left_border, right_border)
     assert len(result) == 3
     groups_, limits_, neighbors_ = result
     assert groups == groups_
@@ -249,7 +250,7 @@ def test_group_2():
     """Test description: valid set up"""
     temp = sums[0][1]
     sums[0][1] = 0
-    result = group(sums, top_border, bottom_border, left_border, right_border)
+    result = KillerSudokuSolver.group(sums, top_border, bottom_border, left_border, right_border)
     assert len(result) == 3
     groups_, limits_, neighbors_ = result
     assert groups == groups_
@@ -260,45 +261,45 @@ def test_group_2():
 # ========== validate_region ==========
 def test_validate_region_1():
     """Test description: Region has empty space and is below total value"""
-    assert validate_region(board, groups, limits, neighbors, 0, 2) == True
+    assert KillerSudokuSolver.validate_region(board, groups, limits, neighbors, 0, 2) == True
 
 def test_validate_region_2():
     """Test description: Region is full and is equal to total value"""
     board[0][2] = '9'
-    assert validate_region(board, groups, limits, neighbors, 0, 2) == True
+    assert KillerSudokuSolver.validate_region(board, groups, limits, neighbors, 0, 2) == True
     board[0][2] = ''
 
 def test_validate_region_3():
     """Test description: Region is full and over total value"""
     board[0][8] = '2'
-    assert validate_region(board, groups, limits, neighbors, 0, 8) == False
+    assert KillerSudokuSolver.validate_region(board, groups, limits, neighbors, 0, 8) == False
     board[0][8] = ''
 
 def test_validate_region_4():
     """Test description: Region is full and under total value"""
     board[0][2] = '1'
-    assert validate_region(board, groups, limits, neighbors, 0, 2) == False
+    assert KillerSudokuSolver.validate_region(board, groups, limits, neighbors, 0, 2) == False
     board[0][2] = ''
 
 def test_validate_region_5():
     """Test description: Region has empty space and is equal to total value"""
     board[4][2] = '9'
-    assert validate_region(board, groups, limits, neighbors, 4, 2) == False
+    assert KillerSudokuSolver.validate_region(board, groups, limits, neighbors, 4, 2) == False
     board[4][2] = ''
 
 def test_validate_region_6():
     """Test description: Region has empty space and is over total value"""
     board[6][1] = '9'
-    assert validate_region(board, groups, limits, neighbors, 6, 1) == False
+    assert KillerSudokuSolver.validate_region(board, groups, limits, neighbors, 6, 1) == False
     board[6][1] = ''
 
 # ========== killer_sudoku_solver ==========
 def test_killer_sudoku_solver_1():
     """Test description: Valid board with solution"""
-    assert killer_sudoku_solver(board, sums, top_border, bottom_border, left_border, right_border) == solution
+    assert KillerSudokuSolver.solve(board, sums, top_border, bottom_border, left_border, right_border) == solution
 
 def test_killer_sudoku_solver_2():
     """Test description: Invalid board with no solution"""
     board[0][0] = '1'
-    assert killer_sudoku_solver(board, sums, top_border, bottom_border, left_border, right_border) == None
+    assert KillerSudokuSolver.solve(board, sums, top_border, bottom_border, left_border, right_border) == None
     board[0][0] = ''
