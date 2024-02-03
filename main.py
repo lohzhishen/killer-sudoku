@@ -1,10 +1,7 @@
 from interaction import Controller, Screenshot
 from detection import Detection
-
-from Solver.sudoku_solver import sudoku_solver
+from solver import KillerSudokuSolver
 from Editor import editor
-import matplotlib.pyplot as plt
-from numpy import asarray
 
 
 def scan(context: dict) -> None:
@@ -21,8 +18,7 @@ if __name__ == '__main__':
     context = {'title': 'Killer Sudoku Solver'}
     scan(context)
     app = editor.KillerSudokuEditor(*context['data'])
-    app.start()
-    # solution = sudoku_solver(context['board'])
-    # print(solution)
-    # implement_solution(context, solution)
+    context['data'] = app.start()
+    solution = KillerSudokuSolver.solve(*context['data'])
+    Controller.implement_solution(context, solution)
     exit()
