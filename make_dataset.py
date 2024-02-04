@@ -66,7 +66,7 @@ def save_box_image(image: np.ndarray) -> None:
     image = PIL.Image.fromarray(image.astype(np.uint8))
     no = len(os.listdir(BOX_OUTPUT)) + len(os.listdir(LABELLED_BOX_OUTPUT))
     file_name = f"{no:>05}.png"
-    # image.save(BOX_OUTPUT / file_name)
+    image.save(BOX_OUTPUT / file_name)
 
 
 # ========== main ==========
