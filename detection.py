@@ -15,7 +15,7 @@ class Detection:
 
         # detect borders
         box = Detection.preprocess_box_region(image)
-        output[2], output[3], output[4], output[5] = Detection.detect_borders(box)
+        output[2], output[3], output[4], output[5] = prediction.Predictor.detect_borders(box)
 
         # get regions of interest
         image_height, image_width = image.shape
@@ -71,13 +71,13 @@ class Detection:
         left = [[False for _ in range(SUDOKU_SIZE)] for _ in range(SUDOKU_SIZE)]
         right = [[False for _ in range(SUDOKU_SIZE)] for _ in range(SUDOKU_SIZE)]
 
-        Xs = np.linspace(0, width, SUDOKU_SIZE + 1, dtype=int)
-        Ys = np.linspace(0, height, SUDOKU_SIZE + 1, dtype=int)
+        Ys = np.linspace(0, width, SUDOKU_SIZE + 1, dtype=int)
+        Xs = np.linspace(0, height, SUDOKU_SIZE + 1, dtype=int)
         offset = 5
         for i in range(SUDOKU_SIZE):
             for j in range(SUDOKU_SIZE):
-                xmin, ymin, xmax, ymax = max(0, Xs[i] - offset), max(0, Ys[j] - offset), min(width, Xs[i + 1] + offset), min(height, Ys[j + 1] + offset)
-                crop = regions[ymin:ymax, xmin:xmax]
+                xmin, ymin, xmax, ymax = max(0, Xs[i] - offset), max(0, Ys[j] - offset), min(height, Xs[i + 1] + offset), min(width, Ys[j + 1] + offset)
+                crop = regions[xmin:xmax, ymin:ymax]
                 board[i][j], sums[i][j], top[i][j], bottom[i][j], left[i][j], right[i][j] = Detection.detect(crop)
         return (board, sums, top, bottom, left, right)
 

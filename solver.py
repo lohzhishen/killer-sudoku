@@ -251,11 +251,13 @@ class KillerSudokuSolver(SudokuSolver):
         # validate the parameters of the game
         if not cls.validate_sudoku_board(board):
             # invalid board arragement
+            print('validate board')
             return None
 
         result = cls.group(sums, top_border, bottom_border, left_border, right_border)
         if result is None:
             # problem detected in either the borders or group limit is inconsistent
+            print('validate groups')
             return None
         groups, limits, neighbors = result
 

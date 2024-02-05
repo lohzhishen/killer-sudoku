@@ -69,4 +69,5 @@ right_border = [[False, True, True, False, True, False, False, True, True],
 
 if __name__ == '__main__':
     app = editor.KillerSudokuEditor(board, sums, top_border, bottom_border, left_border, right_border)
-    app.start()
+    data = app.start()  
+    

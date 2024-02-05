@@ -5,7 +5,7 @@ import numpy as np
 
 class Predictor:
     digit_recognizer = keras.models.load_model(pathlib.Path('Models', 'digit_recognizer.keras'))
-    wall_reocognizer = keras.models.load_model(pathlib.Path('Models', 'wall_recognizer.keras'))
+    wall_recognizer = keras.models.load_model(pathlib.Path('Models', 'wall_recognizer.keras'))
 
     @staticmethod
     def format_image(image: np.ndarray) -> tf.data.Dataset:
@@ -26,5 +26,5 @@ class Predictor:
     @classmethod
     def detect_borders(cls, image: np.ndarray) -> tuple[bool, bool, bool, bool]:
         image = cls.format_image(image)
-        return tuple((cls.wall_recognizer.predict(image) < 0.5)[0])
+        return tuple((cls.wall_recognizer.predict(image) >= 0.5)[0])
     

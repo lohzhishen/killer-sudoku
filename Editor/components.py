@@ -72,6 +72,7 @@ class Board:
 
     def update(self: 'Board', i:int , j: int, k: int, new_value) -> None:
         self.data[i][j][k] = new_value
+        print(f"board: update board: {i}, pos: {(j, k)}, new value: {new_value}")
         self.small_boxes[j][k].update()
 
 
@@ -121,8 +122,8 @@ class Box:
 
         # position on the screen
         game_left, game_top = board.position
-        self.left = game_left + 1 + (self.width + 1) * row
-        self.top = game_top + 1 + (self.height + 1) * column
+        self.left = game_left + 1 + (self.width + 1) * column
+        self.top = game_top + 1 + (self.height + 1) * row
         
         # rendering properties
         self.display_sum = display_sum
@@ -155,6 +156,7 @@ class Box:
         return self.rect.collidepoint(pos)
     
     def update(self):
+        print(f"small box: pos: {(self.row, self.column)}, new data: {self.board.get(self.row, self.column)}")
         self.__value = self.board.get(self.row, self.column)
         self.border = []
         self.display_sum = self.__value[1] != 0
@@ -219,6 +221,7 @@ class Editor:
 
     def select(self, i, j):
         self.selected = (i, j)
+        print(f"selected: {self.selected}, read: {self.board.get(*self.selected)}")
         for value, row in zip(self.board.get(*self.selected), self.editor_rows):
             row.value = value
 
@@ -285,6 +288,7 @@ class DigitEditorRow(EditorRow):
         i, j = self.editor.selected
         if self.active and i != -1 and j != -1 and new_value in self.valid:
             self.value = new_value
+            print(f"update_board: {self.row}, pos: {(i, j)}, new value: {new_value}")
             self.board.update(self.row, i, j, new_value)
 
 
