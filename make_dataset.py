@@ -15,6 +15,7 @@ LABELLED_BOX_OUTPUT = pathlib.Path('Models', 'Dataset', 'Wall Recognizer', 'Labe
 
 # ========== processing functions ============
 def process_board(screen: np.ndarray) -> list[list[int]]:
+    """Modified version of the code to process the board - creates a dataset instead of making predictions."""
     regions = Detection.preprocess_board(screen)
     height, width = regions.shape
 
@@ -29,6 +30,7 @@ def process_board(screen: np.ndarray) -> list[list[int]]:
 
 
 def process_box(image: np.ndarray) -> None:
+    """Modified version of the code to process a box - creates a dataset instead of making predictions."""
     # save the image
     save_box_image(Detection.preprocess_box_region(image))
 
@@ -55,6 +57,7 @@ def process_box(image: np.ndarray) -> None:
 
 # ========== saving images ==========
 def save_digit_image(image: np.ndarray) -> None:
+    """Saves an image of a digit to disk."""
     # save the image
     image = PIL.Image.fromarray(image.astype(np.uint8))
     file_name = f"{len(os.listdir(DIGIT_OUTPUT)):>05}.png"
@@ -62,6 +65,7 @@ def save_digit_image(image: np.ndarray) -> None:
 
 
 def save_box_image(image: np.ndarray) -> None:
+    """Saves an image of the box to disk."""
     # save the image
     image = PIL.Image.fromarray(image.astype(np.uint8))
     no = len(os.listdir(BOX_OUTPUT)) + len(os.listdir(LABELLED_BOX_OUTPUT))
@@ -71,6 +75,7 @@ def save_box_image(image: np.ndarray) -> None:
 
 # ========== main ==========
 def main():
+    """Creates a dataset"""
     context = {"title": 'Dataset Maker'}
     context['screen'] = Screenshot.scan_sudoku_board(context)
     process_board(context['screen'])

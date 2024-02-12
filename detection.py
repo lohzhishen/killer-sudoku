@@ -11,6 +11,7 @@ from config import *
 class Detection:
     @staticmethod
     def detect(image: np.ndarray) -> tuple[str, int, bool, bool, bool, bool]:
+        """Returns the inferences for this box - digit, sum, top border, bottom border, left border, right border"""
         output = ['', 0, False, False, False, False]
 
         # detect borders
@@ -48,6 +49,7 @@ class Detection:
 
     @staticmethod
     def preprocess_board(screen: np.ndarray) -> np.ndarray:
+        """Returns the image of the board after preprocessing."""
         screen = np.asarray(screen)
 
         # convert to grayscale
@@ -61,6 +63,7 @@ class Detection:
 
     @staticmethod
     def process_board(screen: np.ndarray) -> tuple[list]:
+        """Overall function to extract data from the image."""
         regions = Detection.preprocess_board(screen)
         height, width = regions.shape
 
@@ -84,6 +87,7 @@ class Detection:
 
     @staticmethod
     def preprocess_digit_region(zones: np.ndarray, region: np.ndarray, offset: int = 2) -> np.ndarray:
+        """Preprocesses the digit image for inference."""
         image = zones.copy()
         h, w = image.shape
 
@@ -118,6 +122,7 @@ class Detection:
 
     @staticmethod
     def preprocess_box_region(image: np.ndarray) -> np.ndarray:
+        """Preprocesses the box image for inference."""
         image = image.copy()
         
         # resize image

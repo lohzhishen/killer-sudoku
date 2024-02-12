@@ -104,6 +104,7 @@ class Screenshot:
 
     @staticmethod
     def scan_sudoku_board(context: dict) -> PIL.Image:
+        """Returns a image of the sudoku game board."""
         # instruct the user on how to select region
         pyautogui.alert(text='Click and drag to outline the sudoku board.', title=context['title'], button='OK')
         time.sleep(1)

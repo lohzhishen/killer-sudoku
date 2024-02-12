@@ -18,6 +18,7 @@ if __name__ == '__main__':
     context = {'title': 'Killer Sudoku Solver'}
     scan(context)
     app = editor.KillerSudokuEditor(*context['data'])
+    context['data'] = app.start()
     solution = KillerSudokuSolver.solve(*context['data'])
     Controller.implement_solution(context, solution)
     exit()
