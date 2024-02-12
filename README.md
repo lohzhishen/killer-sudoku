@@ -1,5 +1,4 @@
 # Killer Sudoku Solver
-
 Killer sudoku is a variant of the sudoku game. In addition to the traditional rules of sudoku, killer sudoku imposes an additional restraint that each region, denoted by dotted lines, has to sum up to a particular value. 
 
 This repository then contains the code needed to (partially) automatically solve the game. The goal of this program would be to extract visual data from the killer sudoku board, process it, and automatically input the solution into the game. The version of the game used for testing can be found [here](https://sudoku.com/killer). 
